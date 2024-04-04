@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
+    "name": "mushroomonitor",
+    "slug": "mushroomonitor",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon-main.png",
@@ -32,5 +32,5 @@
       "expo-router"
     ]
   },
-  "scheme": "mushroomonitor-app"
+  "scheme": "msh://mushroomonitor"
 }

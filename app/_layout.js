@@ -1,19 +1,21 @@
-import { Slot } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Stack } from "expo-router/stack";
 
-import Footer from "./footer";
 import Header from "./header";
 
-const Root = () => {
+const AppLayout = () => {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Header />
-      <Slot />
-      <Footer />
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#EFF0F1" }}>
+      <Stack
+        screenOptions={{
+          statusBarColor: "#309810",
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="(tabs)" />
+      </Stack>
     </SafeAreaView>
   );
 };
 
-export default Root;
+export default AppLayout;
