@@ -2,6 +2,7 @@
   "expo": {
     "name": "mushroomonitor",
     "slug": "mushroomonitor",
+    "scheme": "mushroomonitor",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon-main.png",
@@ -10,20 +11,20 @@
       "image": "./assets/splash-main.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
-
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mushrooinc.mushroomonitor"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-main.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.myapp"
+      "package": "com.mushrooinc.mushroomonitor"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -31,6 +32,5 @@
     "plugins": [
       "expo-router"
     ]
-  },
-  "scheme": "msh://mushroomonitor"
+  }
 }
