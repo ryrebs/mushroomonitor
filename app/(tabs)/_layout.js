@@ -28,7 +28,7 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarIcon: ({ color }) => (
-            <Feather name="home" size={24} color={color} />
+            <Feather name="home" size={30} color={color} />
           ),
         }}
       />
@@ -38,7 +38,7 @@ export default function TabLayout() {
           header: ({ props }) => <NotifHeader {...props} />,
           title: "",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="notifications-outline" size={24} color={color} />
+            <Ionicons name="notifications-outline" size={30} color={color} />
           ),
         }}
       />
@@ -49,7 +49,7 @@ export default function TabLayout() {
 
           title: "",
           tabBarIcon: ({ color }) => (
-            <FontAwesome name="question-circle-o" size={24} color={color} />
+            <FontAwesome name="question-circle-o" size={30} color={color} />
           ),
         }}
       />

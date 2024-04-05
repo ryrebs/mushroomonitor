@@ -1,13 +1,20 @@
-import { useState } from "react";
-import { Button, Pressable, StyleSheet, Text, View } from "react-native";
-import { FontAwesome6 } from "@expo/vector-icons";
-import { Fontisto } from "@expo/vector-icons";
+import { useContext } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { FilterContext } from "./context";
 
 export default function NotifHeader() {
-  const [deviceState, setDeviceState] = useState({
-    temp: 30,
-    humidity: 95,
-  });
+  const { notifFilter, setNotifFilter } = useContext(FilterContext);
+
+  const setActive = (filterN: string) => {
+    setNotifFilter(() => {
+      return {
+        today: false,
+        lastWeek: false,
+        lastMonth: false,
+        [filterN]: true,
+      };
+    });
+  };
 
   return (
     <View style={styles.main}>
@@ -17,16 +24,60 @@ export default function NotifHeader() {
           style={{
             flexDirection: "row",
             alignItems: "center",
+            justifyContent: "space-around",
           }}
         >
-          <Pressable>
-            <Text>Today</Text>
+          <Pressable
+            style={[
+              styles.notifBtnActive,
+              { backgroundColor: notifFilter.today ? "#ffffff" : "#3ab913" },
+            ]}
+            onPress={() => setActive("today")}
+          >
+            <Text
+              style={[
+                { fontWeight: "bold" },
+                { color: notifFilter.today ? "#000000" : "#ffffff" },
+              ]}
+            >
+              Today
+            </Text>
           </Pressable>
-          <Pressable>
-            <Text>Last Week</Text>
+          <Pressable
+            style={[
+              styles.notifBtnActive,
+              {
+                backgroundColor: notifFilter.lastWeek ? "#ffffff" : "#3ab913",
+              },
+            ]}
+            onPress={() => setActive("lastWeek")}
+          >
+            <Text
+              style={[
+                { fontWeight: "bold" },
+                { color: notifFilter.lastWeek ? "#000000" : "#ffffff" },
+              ]}
+            >
+              Last Week
+            </Text>
           </Pressable>
-          <Pressable>
-            <Text>Last Month</Text>
+          <Pressable
+            style={[
+              styles.notifBtnActive,
+              {
+                backgroundColor: notifFilter.lastMonth ? "#ffffff" : "#3ab913",
+              },
+            ]}
+            onPress={() => setActive("lastMonth")}
+          >
+            <Text
+              style={[
+                { fontWeight: "bold" },
+                { color: notifFilter.lastMonth ? "#000000" : "#ffffff" },
+              ]}
+            >
+              Last Month
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -35,30 +86,19 @@ export default function NotifHeader() {
 }
 
 const styles = StyleSheet.create({
-  headerIconContainer: {
-    borderRadius: 360,
-    width: 70,
-    height: 70,
+  notifBtnActive: {
+    borderRadius: 20,
+    height: 35,
+    width: 90,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#9FDC9E",
-    marginRight: 10,
   },
   tempOver: {
     backgroundColor: "#AD1014",
   },
   telem: {
-    flexDirection: "row",
-    marginTop: 25,
-    columnGap: 30,
-  },
-  telemLabel: {
-    color: "#ffffff",
-    fontSize: 15,
-  },
-  telemLabel__bold: {
-    fontWeight: "bold",
-    fontSize: 23,
+    marginTop: 20,
+    width: "80%",
   },
   main: {
     height: 200,
@@ -72,9 +112,5 @@ const styles = StyleSheet.create({
     fontSize: 35,
     color: "white",
     fontWeight: "700",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
   },
 });
