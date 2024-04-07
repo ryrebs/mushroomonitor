@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { Foundation } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -22,14 +22,17 @@ export default function Index() {
     humidifier: false,
   });
 
+  const [fntSize, setFntSize] = useState(0);
+
+  const onTelemLabelLayout = (event: any) => {
+    console.log(event.nativeEvent);
+    const { _, height } = event.nativeEvent.layout;
+    setFntSize(height);
+  };
+
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          flexDirection: "row",
-          columnGap: 20,
-        }}
-      >
+      <View style={styles.deviceContainer}>
         <View
           style={[
             styles.deviceBgStyle,
@@ -62,15 +65,7 @@ export default function Index() {
           />
           <DevLabel isOn={deviceState.fan} label="Fan" />
         </View>
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          columnGap: 20,
-          marginTop: 20,
-          marginBottom: 20,
-        }}
-      >
+
         <View
           style={[
             styles.deviceBgStyle,
@@ -87,34 +82,42 @@ export default function Index() {
                 : styles.deviceIconOffStyle,
             ]}
           />
-          <DevLabel isOn={deviceState.sprinkler} label="Sprinkler" />
-        </View>
-        <View
-          style={[
-            styles.deviceBgStyle,
-            deviceState.humidifier
-              ? styles.deviceBgOnStyle
-              : styles.deviceBgOffStyle,
-          ]}
-        >
-          <MaterialCommunityIcons
-            name="air-humidifier"
-            style={[
-              deviceState.humidifier
-                ? styles.deviceIconOnStyle
-                : styles.deviceIconOffStyle,
-            ]}
-          />
-          <DevLabel isOn={deviceState.humidifier} label="Humidifier" />
+          <DevLabel isOn={deviceState.sprinkler} label="Mistmaker" />
         </View>
       </View>
-      <View style={styles.devNormalIndicator}>
-        <Text>Normal Temperature Levels</Text>
-        <Text>23&#176;C - 28&#176;C</Text>
-      </View>
-      <View style={styles.devNormalIndicator}>
-        <Text>Normal Humidity Levels</Text>
-        <Text>80% - 95%</Text>
+      <View style={styles.labelIndContainer}>
+        <View style={styles.devNormalIndicator} onLayout={onTelemLabelLayout}>
+          <Text
+            style={{
+              fontSize: fntSize * 0.25,
+            }}
+          >
+            Normal Temperature Levels
+          </Text>
+          <Text
+            style={{
+              fontSize: fntSize * 0.25,
+            }}
+          >
+            23&#176;C - 28&#176;C
+          </Text>
+        </View>
+        <View style={styles.devNormalIndicator}>
+          <Text
+            style={{
+              fontSize: fntSize * 0.25,
+            }}
+          >
+            Normal Humidity Levels
+          </Text>
+          <Text
+            style={{
+              fontSize: fntSize * 0.25,
+            }}
+          >
+            80% - 95%
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -124,8 +127,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    justifyContent: "space-between",
+  },
+  deviceContainer: {
+    marginTop: "6%",
+    height: "60%",
+    flexDirection: "row",
     justifyContent: "center",
-    paddingTop: 30,
+    alignItems: "center",
+    flexWrap: "wrap",
+    alignContent: "center",
+    columnGap: 10,
+    rowGap: 10,
   },
   title: {
     fontSize: 64,
@@ -144,8 +157,8 @@ const styles = StyleSheet.create({
     fontSize: 60,
   },
   deviceBgStyle: {
-    height: 110,
-    width: 110,
+    height: "45%",
+    width: "40%",
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
@@ -161,9 +174,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#ffffff",
     width: "80%",
-    height: 75,
+    height: "40%",
     borderRadius: 15,
+    rowGap: 2,
+  },
+  labelIndContainer: {
+    height: "30%",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
     rowGap: 5,
-    margin: 10,
   },
 });

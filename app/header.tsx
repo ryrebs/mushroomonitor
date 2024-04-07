@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
 
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
   telem: {
     flexDirection: "row",
-    marginTop: 25,
+    marginTop: "7%",
     columnGap: 30,
   },
   telemLabel: {
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     fontSize: 23,
   },
   main: {
-    height: 200,
+    height: Dimensions.get("screen").height * 0.25,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#309810",
