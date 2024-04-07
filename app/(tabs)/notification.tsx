@@ -1,56 +1,81 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View, ScrollView } from "react-native";
-import { FilterContext } from "../context";
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  orderBy,
+  limit,
+  query,
+  getDoc,
+  doc,
+  getDocs,
+} from "firebase/firestore";
+
+import { IndexContext } from "../context";
+import { fsApp } from "../_layout";
 
 const now = new Date();
+const db = getFirestore(fsApp);
+const notifRef = collection(db, "notification");
 
 export default () => {
-  const [notifs, setNotifs] = useState([
-    {
-      content:
-        "System detected that temperature levels is high. System detected that temperature levels is high System detected that temperature levels \
-    temperature levels is high System detected that temperature levels is \
-    high System detected that temperature levels is high System detected \
-    that temperature levels is high System detected that temperature \
-    levels is high",
-      timestamp: new Date(),
-    },
-    {
-      content:
-        "1 System detected that temperature levels is high. System detected that \
-    temperature levels is high System detected that temperature levels is \
-    high System detected that temperature levels is high System detected \
-    that temperature levels is high System detected that temperature \
-    levels is high",
-      time: "11:55 AM",
-      date: "October 6, 2023",
-      timestamp: new Date(),
-    },
-    {
-      content:
-        "3 System detected that temperature levels is high. System detected that \
-    temperature levels is high System detected that temperature levels is \
-    high System detected that temperature levels is high System detected \
-    that temperature levels is high System detected that temperature \
-    levels is high",
-      time: "10:55 AM",
-      date: "October 5, 2023",
-      timestamp: new Date(new Date(now).setDate(now.getDate() - 30)),
-    },
-    {
-      content:
-        "2 System detected that temperature levels is high. System detected that \
-    temperature levels is high System detected that temperature levels is \
-    high System detected that temperature levels is high System detected \
-    that temperature levels is high System detected that temperature \
-    levels is high",
-      time: "10:55 AM",
-      date: "October 6, 2023",
-      timestamp: new Date(new Date(now).setDate(now.getDate() - 7)),
-    },
-  ]);
+  const [notifs, setNotifs] = useState([]);
 
-  const { notifFilter } = useContext(FilterContext);
+  const { todayF, lastWeekF, lastMonthF } = useContext(IndexContext);
+
+  const filternNotifs = (notif: any) => {
+    if (todayF) {
+      return notif.timestamp.getDate() >= now.getDate();
+    }
+    // TODO
+    if (lastWeekF) {
+      return true;
+    }
+    // TODO
+    if (lastMonthF) {
+      return true;
+    }
+  };
+
+  // Get initial data
+  useEffect(() => {
+    const getData = async () => {
+      const q = query(notifRef, orderBy("timestamp", "asc"), limit(5));
+      const snap = await getDocs(q);
+      const notifs_: any = [];
+      snap.forEach((d) => {
+        notifs_.push({
+          content: d.data().content,
+          timestamp: new Date(d.data().timestamp),
+        });
+      });
+      notifs_.filter(filternNotifs);
+      setNotifs(notifs_);
+    };
+    getData();
+  }, [todayF, lastWeekF, lastMonthF]);
+
+  useEffect(() => {
+    const getData = async () => {
+      onSnapshot(notifRef, (snapshot) => {
+        snapshot.docChanges().forEach((change: any) => {
+          const notifs_: any = [];
+          if (change.type === "added") {
+            const { timestamp, content } = change.doc.data();
+            notifs_.push({
+              content: content,
+              timestamp: new Date(timestamp),
+            });
+            setNotifs((prev: any) => {
+              return [...prev, ...notifs_];
+            });
+          }
+        });
+      });
+    };
+    getData();
+  }, []);
 
   return (
     <View style={styles.container}>

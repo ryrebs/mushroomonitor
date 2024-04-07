@@ -1,7 +1,24 @@
-import { useState } from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { useState, useEffect, useContext } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { Foundation } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  orderBy,
+  limit,
+  query,
+  getDoc,
+  doc,
+  getDocs,
+} from "firebase/firestore";
+
+import { fsApp } from "../_layout";
+import { IndexContext } from "../context";
+
+const db = getFirestore(fsApp);
+const telemRef = collection(db, "telemetry");
 
 const DevLabel = ({ isOn, label }: any) => (
   <Text
@@ -15,20 +32,56 @@ const DevLabel = ({ isOn, label }: any) => (
 );
 
 export default function Index() {
-  const [deviceState, setDeviceState] = useState({
-    bulb: true,
-    fan: false,
-    sprinkler: false,
-    humidifier: false,
-  });
-
+  const { telemState, setTelemState } = useContext(IndexContext);
   const [fntSize, setFntSize] = useState(0);
 
   const onTelemLabelLayout = (event: any) => {
-    console.log(event.nativeEvent);
     const { _, height } = event.nativeEvent.layout;
     setFntSize(height);
   };
+
+  // Listen for changes
+  useEffect(() => {
+    const getData = async () => {
+      onSnapshot(telemRef, (snapshot) => {
+        snapshot.docChanges().forEach((change: any) => {
+          if (change.type === "added") {
+            const { humidity, isBulbOn, isFanOn, isMistOn, temperature } =
+              change.doc.data();
+            setTelemState((prev: any) => ({
+              ...prev,
+              humidity,
+              isBulbOn,
+              isFanOn,
+              isMistOn,
+              temperature,
+            }));
+          }
+        });
+      });
+    };
+    getData();
+  }, []);
+
+  // Get initial data
+  useEffect(() => {
+    const getData = async () => {
+      const q = query(telemRef, orderBy("timestamp", "asc"), limit(1));
+      const snap = await getDocs(q);
+      snap.forEach((d) => {
+        const { humidity, isBulbOn, isFanOn, isMistOn, temperature } = d.data();
+        setTelemState((prev: any) => ({
+          ...prev,
+          humidity,
+          isBulbOn,
+          isFanOn,
+          isMistOn,
+          temperature,
+        }));
+      });
+    };
+    getData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -36,40 +89,44 @@ export default function Index() {
         <View
           style={[
             styles.deviceBgStyle,
-            deviceState.bulb ? styles.deviceBgOnStyle : styles.deviceBgOffStyle,
+            telemState.isBulbOn
+              ? styles.deviceBgOnStyle
+              : styles.deviceBgOffStyle,
           ]}
         >
           <Foundation
             name="lightbulb"
             style={[
-              deviceState.bulb
+              telemState.isBulbOn
                 ? styles.deviceIconOnStyle
                 : styles.deviceIconOffStyle,
             ]}
           />
-          <DevLabel isOn={deviceState.bulb} label="Bulb" />
+          <DevLabel isOn={telemState.isBulbOn} label="Bulb" />
         </View>
         <View
           style={[
             styles.deviceBgStyle,
-            deviceState.fan ? styles.deviceBgOnStyle : styles.deviceBgOffStyle,
+            telemState.isFanOn
+              ? styles.deviceBgOnStyle
+              : styles.deviceBgOffStyle,
           ]}
         >
           <MaterialCommunityIcons
             name="fan"
             style={[
-              deviceState.fan
+              telemState.isFanOn
                 ? styles.deviceIconOnStyle
                 : styles.deviceIconOffStyle,
             ]}
           />
-          <DevLabel isOn={deviceState.fan} label="Fan" />
+          <DevLabel isOn={telemState.isFanOn} label="Fan" />
         </View>
 
         <View
           style={[
             styles.deviceBgStyle,
-            deviceState.sprinkler
+            telemState.isMistOn
               ? styles.deviceBgOnStyle
               : styles.deviceBgOffStyle,
           ]}
@@ -77,12 +134,12 @@ export default function Index() {
           <MaterialCommunityIcons
             name="sprinkler"
             style={[
-              deviceState.sprinkler
+              telemState.isMistOn
                 ? styles.deviceIconOnStyle
                 : styles.deviceIconOffStyle,
             ]}
           />
-          <DevLabel isOn={deviceState.sprinkler} label="Mistmaker" />
+          <DevLabel isOn={telemState.isMistOn} label="Mistmaker" />
         </View>
       </View>
       <View style={styles.labelIndContainer}>

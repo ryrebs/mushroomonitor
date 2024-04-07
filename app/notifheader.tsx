@@ -1,16 +1,17 @@
 import { useContext } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { FilterContext } from "./context";
+import { IndexContext } from "./context";
 
 export default function NotifHeader() {
-  const { notifFilter, setNotifFilter } = useContext(FilterContext);
+  const { telemState, setTelemState } = useContext(IndexContext);
 
   const setActive = (filterN: string) => {
-    setNotifFilter(() => {
+    setTelemState((prev: any) => {
       return {
-        today: false,
-        lastWeek: false,
-        lastMonth: false,
+        ...prev,
+        todayF: false,
+        lastWeekF: false,
+        lastMonthF: false,
         [filterN]: true,
       };
     });
@@ -30,14 +31,14 @@ export default function NotifHeader() {
           <Pressable
             style={[
               styles.notifBtnActive,
-              { backgroundColor: notifFilter.today ? "#ffffff" : "#3ab913" },
+              { backgroundColor: telemState.todayF ? "#ffffff" : "#3ab913" },
             ]}
-            onPress={() => setActive("today")}
+            onPress={() => setActive("todayF")}
           >
             <Text
               style={[
                 { fontWeight: "bold" },
-                { color: notifFilter.today ? "#000000" : "#ffffff" },
+                { color: telemState.todayF ? "#000000" : "#ffffff" },
               ]}
             >
               Today
@@ -47,15 +48,15 @@ export default function NotifHeader() {
             style={[
               styles.notifBtnActive,
               {
-                backgroundColor: notifFilter.lastWeek ? "#ffffff" : "#3ab913",
+                backgroundColor: telemState.lastWeekF ? "#ffffff" : "#3ab913",
               },
             ]}
-            onPress={() => setActive("lastWeek")}
+            onPress={() => setActive("lastWeekF")}
           >
             <Text
               style={[
                 { fontWeight: "bold" },
-                { color: notifFilter.lastWeek ? "#000000" : "#ffffff" },
+                { color: telemState.lastWeekF ? "#000000" : "#ffffff" },
               ]}
             >
               Last Week
@@ -65,15 +66,15 @@ export default function NotifHeader() {
             style={[
               styles.notifBtnActive,
               {
-                backgroundColor: notifFilter.lastMonth ? "#ffffff" : "#3ab913",
+                backgroundColor: telemState.lastMonthf ? "#ffffff" : "#3ab913",
               },
             ]}
-            onPress={() => setActive("lastMonth")}
+            onPress={() => setActive("lastMonthf")}
           >
             <Text
               style={[
                 { fontWeight: "bold" },
-                { color: notifFilter.lastMonth ? "#000000" : "#ffffff" },
+                { color: telemState.lastMonthf ? "#000000" : "#ffffff" },
               ]}
             >
               Last Month

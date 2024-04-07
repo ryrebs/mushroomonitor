@@ -1,14 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
+import { IndexContext } from "./context";
 
 export default function Header() {
-  const [deviceState, setDeviceState] = useState({
-    temp: 30,
-    humidity: 95,
-  });
-
+  const { telemState } = useContext(IndexContext);
   return (
     <View style={styles.main}>
       <Text style={styles.title}>MushrooMonitor</Text>
@@ -22,14 +19,14 @@ export default function Header() {
           <View
             style={[
               styles.headerIconContainer,
-              deviceState.temp > 28 ? styles.tempOver : null,
+              telemState.temperature > 28 ? styles.tempOver : null,
             ]}
           >
             <FontAwesome6 name="temperature-half" size={40} color="white" />
           </View>
           <View>
             <Text style={[styles.telemLabel, styles.telemLabel__bold]}>
-              {deviceState.temp > 0 ? deviceState.temp : "-"}&#176;C
+              {telemState.temperature > 0 ? telemState.temperature : "-"}&#176;C
             </Text>
             <Text style={styles.telemLabel}>Temp</Text>
           </View>
@@ -44,14 +41,14 @@ export default function Header() {
           <View
             style={[
               styles.headerIconContainer,
-              deviceState.humidity > 95 ? styles.tempOver : null,
+              telemState.humidity > 95 ? styles.tempOver : null,
             ]}
           >
             <Fontisto name="blood-drop" size={40} color="white" />
           </View>
           <View>
             <Text style={[styles.telemLabel, styles.telemLabel__bold]}>
-              {deviceState.humidity > 0 ? deviceState.humidity : "-"}%
+              {telemState.humidity > 0 ? telemState.humidity : "-"}%
             </Text>
             <Text style={styles.telemLabel}>Humidity</Text>
           </View>
