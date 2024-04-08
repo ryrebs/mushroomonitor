@@ -18,7 +18,7 @@ import { fsApp } from "../_layout";
 import { IndexContext } from "../context";
 
 const db = getFirestore(fsApp);
-const telemRef = collection(db, "telemetry");
+const telemRef = collection(db, "sensor_data");
 
 const DevLabel = ({ isOn, label }: any) => (
   <Text

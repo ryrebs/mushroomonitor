@@ -66,15 +66,15 @@ export default function NotifHeader() {
             style={[
               styles.notifBtnActive,
               {
-                backgroundColor: telemState.lastMonthf ? "#ffffff" : "#3ab913",
+                backgroundColor: telemState.lastMonthF ? "#ffffff" : "#3ab913",
               },
             ]}
-            onPress={() => setActive("lastMonthf")}
+            onPress={() => setActive("lastMonthF")}
           >
             <Text
               style={[
                 { fontWeight: "bold" },
-                { color: telemState.lastMonthf ? "#000000" : "#ffffff" },
+                { color: telemState.lastMonthF ? "#000000" : "#ffffff" },
               ]}
             >
               Last Month

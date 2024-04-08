@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
 import {
   getFirestore,
   collection,
@@ -15,26 +15,38 @@ import {
 import { IndexContext } from "../context";
 import { fsApp } from "../_layout";
 
-const now = new Date();
 const db = getFirestore(fsApp);
 const notifRef = collection(db, "notification");
 
+const dayinminutes = 86400;
+const weekinminutes = 604800;
+const monthinminutes = 2592000;
+
 export default () => {
+  const now = new Date();
   const [notifs, setNotifs] = useState([]);
+  const { telemState } = useContext(IndexContext);
+  const [filled, setFilled] = useState(false);
 
-  const { todayF, lastWeekF, lastMonthF } = useContext(IndexContext);
+  const filternNotifs = (notifs_: any) => {
+    if (telemState.todayF) {
+      return notifs_.filter((ntf) => {
+        const deltasec = (now.getTime() - ntf.timestamp) / 1000;
+        return deltasec <= dayinminutes;
+      });
+    }
 
-  const filternNotifs = (notif: any) => {
-    if (todayF) {
-      return notif.timestamp.getDate() >= now.getDate();
+    if (telemState.lastWeekF) {
+      return notifs_.filter((ntf: any) => {
+        const deltasec = (now.getTime() - ntf.timestamp) / 1000;
+        return deltasec >= weekinminutes && deltasec < monthinminutes;
+      });
     }
-    // TODO
-    if (lastWeekF) {
-      return true;
-    }
-    // TODO
-    if (lastMonthF) {
-      return true;
+    if (telemState.lastMonthF) {
+      return notifs_.filter((ntf: any) => {
+        const deltasec = (now.getTime() - ntf.timestamp) / 1000;
+        return deltasec >= monthinminutes;
+      });
     }
   };
 
@@ -43,39 +55,45 @@ export default () => {
     const getData = async () => {
       const q = query(notifRef, orderBy("timestamp", "asc"), limit(5));
       const snap = await getDocs(q);
-      const notifs_: any = [];
+      let notifs_: any = [];
       snap.forEach((d) => {
         notifs_.push({
           content: d.data().content,
-          timestamp: new Date(d.data().timestamp),
+          timestamp: d.data().timestamp,
         });
       });
-      notifs_.filter(filternNotifs);
+      notifs_ = filternNotifs(notifs_);
       setNotifs(notifs_);
     };
     getData();
-  }, [todayF, lastWeekF, lastMonthF]);
+    setFilled(true);
+  }, [telemState.todayF, telemState.lastWeekF, telemState.lastMonthF]);
 
+  // listen to changes
   useEffect(() => {
     const getData = async () => {
       onSnapshot(notifRef, (snapshot) => {
         snapshot.docChanges().forEach((change: any) => {
-          const notifs_: any = [];
+          let notifs_: any = [];
           if (change.type === "added") {
             const { timestamp, content } = change.doc.data();
             notifs_.push({
               content: content,
-              timestamp: new Date(timestamp),
+              timestamp: timestamp,
             });
-            setNotifs((prev: any) => {
+            notifs_ = filternNotifs(notifs_);
+            setNotifs((prev) => {
               return [...prev, ...notifs_];
             });
           }
         });
       });
     };
-    getData();
-  }, []);
+    if (filled) {
+      getData();
+      setFilled(false);
+    }
+  }, [filled]);
 
   return (
     <View style={styles.container}>
@@ -91,6 +109,7 @@ export default () => {
                 marginVertical: 10,
                 backgroundColor: "#ffffff",
                 borderRadius: 15,
+                minWidth: Dimensions.get("screen").width * 0.8,
               }}
             >
               <View
@@ -101,9 +120,9 @@ export default () => {
                 }}
               >
                 <Text style={{ fontWeight: "bold" }}>
-                  {ntfs.timestamp.toDateString()}
+                  {new Date(ntfs.timestamp).toDateString()}
                 </Text>
-                <Text>{ntfs.timestamp.toLocaleTimeString()}</Text>
+                <Text>{new Date(ntfs.timestamp).toLocaleTimeString()}</Text>
               </View>
               <Text
                 style={{

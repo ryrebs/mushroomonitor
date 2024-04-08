@@ -4,7 +4,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router/stack";
 
 import { IndexContext } from "./context";
-import firebaseConfig from "../firebaseConfig";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAq2gc3jCYGX7vQinF-v7xGdzBdqSMCsC0",
+  authDomain: "mushroomonitor.firebaseapp.com",
+  projectId: "mushroomonitor",
+  storageBucket: "mushroomonitor.appspot.com",
+  messagingSenderId: "909525684111",
+  appId: "1:909525684111:web:cfca3e8c013ed11bf8c5fa",
+  measurementId: "G-QEPBDY56L3",
+};
 
 const fsApp = initializeApp(firebaseConfig);
 
