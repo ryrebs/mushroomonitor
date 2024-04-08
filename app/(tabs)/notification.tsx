@@ -26,7 +26,6 @@ export default () => {
   const now = new Date();
   const [notifs, setNotifs] = useState([]);
   const { telemState } = useContext(IndexContext);
-  const [filled, setFilled] = useState(false);
 
   const filternNotifs = (notifs_: any) => {
     if (telemState.todayF) {
@@ -66,7 +65,6 @@ export default () => {
       setNotifs(notifs_);
     };
     getData();
-    setFilled(true);
   }, [telemState.todayF, telemState.lastWeekF, telemState.lastMonthF]);
 
   // listen to changes
@@ -89,11 +87,8 @@ export default () => {
         });
       });
     };
-    if (filled) {
-      getData();
-      setFilled(false);
-    }
-  }, [filled]);
+    getData();
+  }, []);
 
   return (
     <View style={styles.container}>
