@@ -60,6 +60,7 @@ export default () => {
       snap.forEach((d) => {
         notifInitIDs_.push(d.id);
         notifs_.push({
+          id: d.id,
           content: d.data().content,
           timestamp: d.data().timestamp,
         });
@@ -69,28 +70,40 @@ export default () => {
       setNotifs(notifs_);
     };
 
-    onSnapshot(notifRef, (snapshot) => {
-      snapshot.docChanges().forEach((change: any) => {
-        let notifs_: any = [];
-        if (change.type === "added") {
-          const { timestamp, content } = change.doc.data();
-          if (currentNotifsIds.includes(change.doc.id)) {
-          } else {
-            notifs_.push({
-              content: content,
-              timestamp: timestamp,
-            });
-          }
-          notifs_ = filternNotifs(notifs_);
-          setNotifs((prev) => {
-            return [...prev, ...notifs_];
-          });
-        }
-      });
-    });
-
     getData();
   }, [telemState.todayF, telemState.lastWeekF, telemState.lastMonthF]);
+
+  useEffect(() => {
+    onSnapshot(notifRef, (snapshot) => {
+      let newNotif: any = [];
+      const currentNotifChangedIDs_: any = [];
+      snapshot.docChanges().forEach((change: any) => {
+        if (change.type === "added") {
+          const { timestamp, content } = change.doc.data();
+          newNotif.push({
+            id: change.doc.id,
+            content: content,
+            timestamp: timestamp,
+          });
+          currentNotifChangedIDs_.push(change.doc.id);
+        }
+      });
+      newNotif = filternNotifs(newNotif);
+      setNotifs((prevNotif) => {
+        let p = [...prevNotif];
+        let pIDs = [];
+        p.forEach((n) => {
+          pIDs.push(n.id);
+        });
+        newNotif.forEach((n) => {
+          if (!pIDs.includes(n.id)) {
+            p.push(n);
+          }
+        });
+        return p;
+      });
+    });
+  }, [currentNotifsIds, setNotifs]);
 
   return (
     <View style={styles.container}>
