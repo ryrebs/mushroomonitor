@@ -25,6 +25,7 @@ const monthinminutes = 2592000;
 export default () => {
   const now = new Date();
   const [notifs, setNotifs] = useState([]);
+  const [currentNotifsIds, setCurrentNotifsIds] = useState([]);
   const { telemState } = useContext(IndexContext);
 
   const filternNotifs = (notifs_: any) => {
@@ -38,7 +39,7 @@ export default () => {
     if (telemState.lastWeekF) {
       return notifs_.filter((ntf: any) => {
         const deltasec = (now.getTime() - ntf.timestamp) / 1000;
-        return deltasec >= weekinminutes && deltasec < monthinminutes;
+        return deltasec >= weekinminutes && deltasec < weekinminutes * 2;
       });
     }
     if (telemState.lastMonthF) {
@@ -51,44 +52,45 @@ export default () => {
 
   // Get initial data
   useEffect(() => {
+    const notifInitIDs_: any = [];
     const getData = async () => {
-      const q = query(notifRef, orderBy("timestamp", "asc"), limit(5));
+      const q = query(notifRef, orderBy("timestamp", "asc"));
       const snap = await getDocs(q);
       let notifs_: any = [];
       snap.forEach((d) => {
+        notifInitIDs_.push(d.id);
         notifs_.push({
           content: d.data().content,
           timestamp: d.data().timestamp,
         });
       });
+      setCurrentNotifsIds(notifInitIDs_);
       notifs_ = filternNotifs(notifs_);
       setNotifs(notifs_);
     };
-    getData();
-  }, [telemState.todayF, telemState.lastWeekF, telemState.lastMonthF]);
 
-  // listen to changes
-  useEffect(() => {
-    const getData = async () => {
-      onSnapshot(notifRef, (snapshot) => {
-        snapshot.docChanges().forEach((change: any) => {
-          let notifs_: any = [];
-          if (change.type === "added") {
-            const { timestamp, content } = change.doc.data();
+    onSnapshot(notifRef, (snapshot) => {
+      snapshot.docChanges().forEach((change: any) => {
+        let notifs_: any = [];
+        if (change.type === "added") {
+          const { timestamp, content } = change.doc.data();
+          if (currentNotifsIds.includes(change.doc.id)) {
+          } else {
             notifs_.push({
               content: content,
               timestamp: timestamp,
             });
-            notifs_ = filternNotifs(notifs_);
-            setNotifs((prev) => {
-              return [...prev, ...notifs_];
-            });
           }
-        });
+          notifs_ = filternNotifs(notifs_);
+          setNotifs((prev) => {
+            return [...prev, ...notifs_];
+          });
+        }
       });
-    };
+    });
+
     getData();
-  }, []);
+  }, [telemState.todayF, telemState.lastWeekF, telemState.lastMonthF]);
 
   return (
     <View style={styles.container}>
