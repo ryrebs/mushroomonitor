@@ -48,7 +48,7 @@ const AppLayout = () => {
   // Listen for changes
   useEffect(() => {
     const getData = async () => {
-      const q = query(telemRef, orderBy("timestamp", "desc"), limit(1));
+      const q = query(telemRef, orderBy("timestamp", "desc"), limit(2));
       onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change: any) => {
           if (change.type === "added") {
