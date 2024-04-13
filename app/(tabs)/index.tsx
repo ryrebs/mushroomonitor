@@ -2,23 +2,8 @@ import { useState, useEffect, useContext } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Foundation } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import {
-  getFirestore,
-  collection,
-  onSnapshot,
-  orderBy,
-  limit,
-  query,
-  getDoc,
-  doc,
-  getDocs,
-} from "firebase/firestore";
 
-import { fsApp } from "../_layout";
 import { IndexContext } from "../context";
-
-const db = getFirestore(fsApp);
-const telemRef = collection(db, "sensor_data");
 
 const DevLabel = ({ isOn, label }: any) => (
   <Text
@@ -40,56 +25,13 @@ export default function Index() {
     setFntSize(height);
   };
 
-  // Listen for changes
-  useEffect(() => {
-    const getData = async () => {
-      onSnapshot(telemRef, (snapshot) => {
-        snapshot.docChanges().forEach((change: any) => {
-          if (change.type === "added") {
-            const { humidity, isBulbOn, isFanOn, isMistOn, temperature } =
-              change.doc.data();
-            setTelemState((prev: any) => ({
-              ...prev,
-              humidity,
-              isBulbOn,
-              isFanOn,
-              isMistOn,
-              temperature,
-            }));
-          }
-        });
-      });
-    };
-    getData();
-  }, []);
-
-  // Get initial data
-  useEffect(() => {
-    const getData = async () => {
-      const q = query(telemRef, orderBy("timestamp", "asc"), limit(1));
-      const snap = await getDocs(q);
-      snap.forEach((d) => {
-        const { humidity, isBulbOn, isFanOn, isMistOn, temperature } = d.data();
-        setTelemState((prev: any) => ({
-          ...prev,
-          humidity,
-          isBulbOn,
-          isFanOn,
-          isMistOn,
-          temperature,
-        }));
-      });
-    };
-    getData();
-  }, []);
-
   return (
     <View style={styles.container}>
       <View style={styles.deviceContainer}>
         <View
           style={[
             styles.deviceBgStyle,
-            telemState.isBulbOn
+            telemState.temperature < 21
               ? styles.deviceBgOnStyle
               : styles.deviceBgOffStyle,
           ]}
@@ -97,17 +39,17 @@ export default function Index() {
           <Foundation
             name="lightbulb"
             style={[
-              telemState.isBulbOn
+              telemState.temperature < 21
                 ? styles.deviceIconOnStyle
                 : styles.deviceIconOffStyle,
             ]}
           />
-          <DevLabel isOn={telemState.isBulbOn} label="Bulb" />
+          <DevLabel isOn={telemState.temperature < 21} label="Bulb" />
         </View>
         <View
           style={[
             styles.deviceBgStyle,
-            telemState.isFanOn
+            telemState.temperature > 28
               ? styles.deviceBgOnStyle
               : styles.deviceBgOffStyle,
           ]}
@@ -115,18 +57,18 @@ export default function Index() {
           <MaterialCommunityIcons
             name="fan"
             style={[
-              telemState.isFanOn
+              telemState.temperature > 28
                 ? styles.deviceIconOnStyle
                 : styles.deviceIconOffStyle,
             ]}
           />
-          <DevLabel isOn={telemState.isFanOn} label="Fan" />
+          <DevLabel isOn={telemState.temperature > 28} label="Fan" />
         </View>
 
         <View
           style={[
             styles.deviceBgStyle,
-            telemState.isMistOn
+            telemState.humidity < 80
               ? styles.deviceBgOnStyle
               : styles.deviceBgOffStyle,
           ]}
@@ -134,12 +76,12 @@ export default function Index() {
           <MaterialCommunityIcons
             name="sprinkler"
             style={[
-              telemState.isMistOn
+              telemState.humidity < 80
                 ? styles.deviceIconOnStyle
                 : styles.deviceIconOffStyle,
             ]}
           />
-          <DevLabel isOn={telemState.isMistOn} label="Mistmaker" />
+          <DevLabel isOn={telemState.humidity < 80} label="Mistmaker" />
         </View>
       </View>
       <View style={styles.labelIndContainer}>

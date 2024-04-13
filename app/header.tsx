@@ -19,7 +19,10 @@ export default function Header() {
           <View
             style={[
               styles.headerIconContainer,
-              telemState.temperature > 28 ? styles.tempOver : null,
+              telemState.temperature > 0 &&
+              (telemState.temperature < 23 || telemState.temperature > 28)
+                ? styles.tempOver
+                : null,
             ]}
           >
             <FontAwesome6 name="temperature-half" size={40} color="white" />
@@ -41,7 +44,10 @@ export default function Header() {
           <View
             style={[
               styles.headerIconContainer,
-              telemState.humidity > 95 ? styles.tempOver : null,
+              telemState.humidity > 1 &&
+              (telemState.humidity < 80 || telemState.humidity > 95)
+                ? styles.tempOver
+                : null,
             ]}
           >
             <Fontisto name="blood-drop" size={40} color="white" />

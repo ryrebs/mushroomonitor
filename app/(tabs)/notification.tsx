@@ -1,14 +1,18 @@
-import { useContext, useEffect, useState } from "react";
-import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
+import { useCallback, useContext, useEffect, useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Dimensions,
+  RefreshControl,
+} from "react-native";
 import {
   getFirestore,
   collection,
   onSnapshot,
   orderBy,
-  limit,
   query,
-  getDoc,
-  doc,
   getDocs,
 } from "firebase/firestore";
 
@@ -16,16 +20,63 @@ import { IndexContext } from "../context";
 import { fsApp } from "../_layout";
 
 const db = getFirestore(fsApp);
-const notifRef = collection(db, "notification");
+const telemRef = collection(db, "sensor_data");
 
 const dayinminutes = 86400;
 const weekinminutes = 604800;
 const monthinminutes = 2592000;
 
+const addContent = (data: any) => {
+  const updateContent: any = [];
+
+  data.forEach((elem) => {
+    if (elem.temperature < 23) {
+      updateContent.push({
+        timestamp: elem.timestamp,
+        content: (
+          <Text style={{ textAlign: "justify" }}>
+            System has detected that the temperature levels were low at
+            <Text style={{ fontWeight: "bold" }}> {elem.temperature} °C </Text>.
+            The heat bulb was automatically turned on to regulate temperature."
+          </Text>
+        ),
+      });
+    }
+
+    if (elem.temperature > 28) {
+      updateContent.push({
+        timestamp: elem.timestamp,
+        content: (
+          <Text style={{ textAlign: "justify" }}>
+            System has detected that the temperature levels were high at
+            <Text style={{ fontWeight: "bold" }}> {elem.temperature} °C</Text>.
+            . The cooling fan was automatically turned on to regulate
+            temperature."
+          </Text>
+        ),
+      });
+    }
+
+    if (elem.humidity < 80) {
+      updateContent.push({
+        timestamp: elem.timestamp,
+        content: (
+          <Text>
+            System has detected that the humidity levels were low at
+            <Text style={{ fontWeight: "bold" }}> {elem.humidity} °C</Text>. .
+            The mistmaker was automatically turned on to regulate humidity.
+          </Text>
+        ),
+      });
+    }
+  });
+
+  return updateContent;
+};
+
 export default () => {
   const now = new Date();
   const [notifs, setNotifs] = useState([]);
-  const [currentNotifsIds, setCurrentNotifsIds] = useState([]);
   const { telemState } = useContext(IndexContext);
 
   const filternNotifs = (notifs_: any) => {
@@ -50,64 +101,72 @@ export default () => {
     }
   };
 
-  // Get initial data
   useEffect(() => {
-    const notifInitIDs_: any = [];
-    const getData = async () => {
-      const q = query(notifRef, orderBy("timestamp", "asc"));
-      const snap = await getDocs(q);
-      let notifs_: any = [];
-      snap.forEach((d) => {
-        notifInitIDs_.push(d.id);
-        notifs_.push({
-          id: d.id,
-          content: d.data().content,
-          timestamp: d.data().timestamp,
-        });
-      });
-      setCurrentNotifsIds(notifInitIDs_);
-      notifs_ = filternNotifs(notifs_);
-      setNotifs(notifs_);
-    };
-
-    getData();
-  }, [telemState.todayF, telemState.lastWeekF, telemState.lastMonthF]);
-
-  useEffect(() => {
-    onSnapshot(notifRef, (snapshot) => {
+    let orderDrc = "desc";
+    if ((telemState.lastWeekF, telemState.lastMonthF)) orderDrc = "asc";
+    const q = query(telemRef, orderBy("timestamp", "desc"));
+    onSnapshot(q, (snapshot) => {
       let newNotif: any = [];
-      const currentNotifChangedIDs_: any = [];
       snapshot.docChanges().forEach((change: any) => {
         if (change.type === "added") {
-          const { timestamp, content } = change.doc.data();
+          const { timestamp, content, temperature, humidity } =
+            change.doc.data();
           newNotif.push({
             id: change.doc.id,
-            content: content,
-            timestamp: timestamp,
+            content,
+            timestamp,
+            temperature,
+            humidity,
           });
-          currentNotifChangedIDs_.push(change.doc.id);
         }
       });
-      newNotif = filternNotifs(newNotif);
+
+      const nt = addContent(newNotif);
       setNotifs((prevNotif) => {
-        let p = [...prevNotif];
-        let pIDs = [];
-        p.forEach((n) => {
-          pIDs.push(n.id);
-        });
-        newNotif.forEach((n) => {
-          if (!pIDs.includes(n.id)) {
-            p.push(n);
-          }
-        });
-        return p;
+        let p = [...prevNotif, ...nt];
+        return filternNotifs(p);
       });
     });
-  }, [currentNotifsIds, setNotifs]);
+  }, [telemState.todayF, telemState.lastWeekF, telemState.lastMonthF]);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    const getData = async () => {
+      let newNotif: any = [];
+
+      let orderDrc = "desc";
+      if ((telemState.lastWeekF, telemState.lastMonthF)) orderDrc = "asc";
+      const q = query(telemRef, orderBy("timestamp", "desc"));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        const { timestamp, content, temperature, humidity } = doc.data();
+        newNotif.push({
+          id: doc.id,
+          content,
+          timestamp,
+          temperature,
+          humidity,
+        });
+      });
+      const nt = addContent(newNotif);
+      const filtered = filternNotifs(nt);
+      setNotifs(filtered);
+    };
+    getData();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {notifs
           .sort((a: any, b: any) => b.timestamp - a.timestamp)
           .map((ntfs, i) => (
@@ -115,7 +174,7 @@ export default () => {
               key={i}
               style={{
                 paddingVertical: 10,
-                paddingHorizontal: 30,
+                paddingHorizontal: 20,
                 marginVertical: 10,
                 backgroundColor: "#ffffff",
                 borderRadius: 15,
@@ -134,13 +193,7 @@ export default () => {
                 </Text>
                 <Text>{new Date(ntfs.timestamp).toLocaleTimeString()}</Text>
               </View>
-              <Text
-                style={{
-                  textAlign: "justify",
-                }}
-              >
-                {ntfs.content}
-              </Text>
+              <Text>{ntfs.content}</Text>
             </View>
           ))}
       </ScrollView>
