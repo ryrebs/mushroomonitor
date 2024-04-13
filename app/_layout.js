@@ -34,9 +34,6 @@ const telemRef = collection(db, "sensor_data");
 
 const AppLayout = () => {
   const [telemState, setTelemState] = useState({
-    isBulbOn: true,
-    isFanOn: false,
-    isMistOn: false,
     temperature: "",
     humidity: "",
     todayF: true,
