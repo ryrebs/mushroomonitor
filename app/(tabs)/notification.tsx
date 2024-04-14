@@ -50,7 +50,7 @@ const addContent = (data: any) => {
           <Text style={{ textAlign: "justify" }}>
             System has detected that the temperature levels were high at
             <Text style={{ fontWeight: "bold" }}> {elem.temperature} °C</Text>.
-            . The cooling fan was automatically turned on to regulate
+            The cooling fan was automatically turned on to regulate
             temperature."
           </Text>
         ),
@@ -63,8 +63,8 @@ const addContent = (data: any) => {
         content: (
           <Text>
             System has detected that the humidity levels were low at
-            <Text style={{ fontWeight: "bold" }}> {elem.humidity} °C</Text>. .
-            The mistmaker was automatically turned on to regulate humidity.
+            <Text style={{ fontWeight: "bold" }}> {elem.humidity} %</Text>. The
+            mistmaker was automatically turned on to regulate humidity.
           </Text>
         ),
       });

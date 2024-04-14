@@ -31,7 +31,7 @@ export default function Index() {
         <View
           style={[
             styles.deviceBgStyle,
-            telemState.temperature < 21
+            telemState.temperature < 23
               ? styles.deviceBgOnStyle
               : styles.deviceBgOffStyle,
           ]}
@@ -39,12 +39,12 @@ export default function Index() {
           <Foundation
             name="lightbulb"
             style={[
-              telemState.temperature < 21
+              telemState.temperature < 23
                 ? styles.deviceIconOnStyle
                 : styles.deviceIconOffStyle,
             ]}
           />
-          <DevLabel isOn={telemState.temperature < 21} label="Bulb" />
+          <DevLabel isOn={telemState.temperature < 23} label="Bulb" />
         </View>
         <View
           style={[
