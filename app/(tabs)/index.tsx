@@ -46,23 +46,12 @@ export default function Index() {
           />
           <DevLabel isOn={telemState.temperature < 23} label="Bulb" />
         </View>
-        <View
-          style={[
-            styles.deviceBgStyle,
-            telemState.temperature > 28
-              ? styles.deviceBgOnStyle
-              : styles.deviceBgOffStyle,
-          ]}
-        >
+        <View style={[styles.deviceBgStyle, styles.deviceBgOnStyle]}>
           <MaterialCommunityIcons
             name="fan"
-            style={[
-              telemState.temperature > 28
-                ? styles.deviceIconOnStyle
-                : styles.deviceIconOffStyle,
-            ]}
+            style={[styles.deviceIconOnStyle]}
           />
-          <DevLabel isOn={telemState.temperature > 28} label="Fan" />
+          <DevLabel isOn={true} label="Fan" />
         </View>
 
         <View
