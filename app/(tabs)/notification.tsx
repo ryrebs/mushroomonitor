@@ -43,20 +43,6 @@ const addContent = (data: any) => {
       });
     }
 
-    if (elem.temperature > 28) {
-      updateContent.push({
-        timestamp: elem.timestamp,
-        content: (
-          <Text style={{ textAlign: "justify" }}>
-            System has detected that the temperature levels were high at
-            <Text style={{ fontWeight: "bold" }}> {elem.temperature} °C</Text>.
-            The cooling fan was automatically turned on to regulate
-            temperature."
-          </Text>
-        ),
-      });
-    }
-
     if (elem.humidity < 80) {
       updateContent.push({
         timestamp: elem.timestamp,
