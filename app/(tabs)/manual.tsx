@@ -24,7 +24,7 @@ export default function Manual() {
             }}
           >
             &#x25CF; View real-time temperature and humidity levels in your
-            mushroom growing chamber.
+            mushroom growing environment.
           </Text>
           <Text
             style={{
@@ -66,9 +66,9 @@ export default function Manual() {
               lineHeight: 20,
             }}
           >
-            &#x25CF; The app is designed to keep your mushroom cultivation
-            environment in check. It will send you notifications when
-            temperature or humidity levels exceed normal thresholds.
+            &#x25CF; The app is designed to keep your mushroom growing
+            environment in check. It will send you notifications when there are
+            system changes.
           </Text>
         </View>
       </ScrollView>

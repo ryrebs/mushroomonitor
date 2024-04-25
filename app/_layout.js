@@ -45,27 +45,22 @@ const AppLayout = () => {
   // Listen for changes
   useEffect(() => {
     const getData = async () => {
-      const q = query(telemRef, orderBy("timestamp", "desc"), limit(2));
+      const q = query(telemRef, orderBy("timestamp", "desc"), limit(1));
       onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change: any) => {
           if (change.type === "added") {
-            const {
-              humidity,
-              isBulbOn,
-              isFanOn,
-              isMistOn,
-              temperature,
-              timestamp,
-            } = change.doc.data();
-            setTelemState((prev: any) => ({
-              ...prev,
-              humidity,
-              isBulbOn,
-              isFanOn,
-              isMistOn,
-              temperature,
-              timestamp,
-            }));
+            const { humidity, temperature, timestamp } = change.doc.data();
+            setTelemState((prev: any) => {
+              // Retain previous value if changes is undefined
+              const h = humidity ? humidity : prev.humidity;
+              const temp = temperature ? temperature : prev.temperature;
+              return {
+                ...prev,
+                humidity: h,
+                temperature: temp,
+                timestamp,
+              };
+            });
           }
         });
       });

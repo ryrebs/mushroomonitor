@@ -31,7 +31,7 @@ export default function Index() {
         <View
           style={[
             styles.deviceBgStyle,
-            telemState.temperature < 23
+            telemState.temperature <= 25
               ? styles.deviceBgOnStyle
               : styles.deviceBgOffStyle,
           ]}
@@ -39,12 +39,12 @@ export default function Index() {
           <Foundation
             name="lightbulb"
             style={[
-              telemState.temperature < 23
+              telemState.temperature <= 25
                 ? styles.deviceIconOnStyle
                 : styles.deviceIconOffStyle,
             ]}
           />
-          <DevLabel isOn={telemState.temperature < 23} label="Bulb" />
+          <DevLabel isOn={telemState.temperature <= 25} label="Bulb" />
         </View>
         <View style={[styles.deviceBgStyle, styles.deviceBgOnStyle]}>
           <MaterialCommunityIcons
@@ -57,7 +57,7 @@ export default function Index() {
         <View
           style={[
             styles.deviceBgStyle,
-            telemState.humidity < 80
+            telemState.humidity <= 90
               ? styles.deviceBgOnStyle
               : styles.deviceBgOffStyle,
           ]}
@@ -65,12 +65,12 @@ export default function Index() {
           <MaterialCommunityIcons
             name="sprinkler"
             style={[
-              telemState.humidity < 80
+              telemState.humidity <= 90
                 ? styles.deviceIconOnStyle
                 : styles.deviceIconOffStyle,
             ]}
           />
-          <DevLabel isOn={telemState.humidity < 80} label="Mistmaker" />
+          <DevLabel isOn={telemState.humidity <= 90} label="Mistmaker" />
         </View>
       </View>
       <View style={styles.labelIndContainer}>

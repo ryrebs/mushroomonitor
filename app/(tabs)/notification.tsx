@@ -30,7 +30,7 @@ const addContent = (data: any) => {
   const updateContent: any = [];
 
   data.forEach((elem) => {
-    if (elem.temperature < 23) {
+    if (elem.temperature <= 25) {
       updateContent.push({
         timestamp: elem.timestamp,
         content: (
@@ -43,7 +43,7 @@ const addContent = (data: any) => {
       });
     }
 
-    if (elem.humidity < 80) {
+    if (elem.humidity <= 90) {
       updateContent.push({
         timestamp: elem.timestamp,
         content: (
@@ -85,6 +85,8 @@ export default () => {
         return deltasec >= monthinminutes;
       });
     }
+
+    return [];
   };
 
   useEffect(() => {
@@ -95,18 +97,15 @@ export default () => {
       let newNotif: any = [];
       snapshot.docChanges().forEach((change: any) => {
         if (change.type === "added") {
-          const { timestamp, content, temperature, humidity } =
-            change.doc.data();
+          const { timestamp, temperature, humidity } = change.doc.data();
           newNotif.push({
             id: change.doc.id,
-            content,
             timestamp,
             temperature,
             humidity,
           });
         }
       });
-
       const nt = addContent(newNotif);
       setNotifs((prevNotif) => {
         let p = [...prevNotif, ...nt];
@@ -127,10 +126,9 @@ export default () => {
       const q = query(telemRef, orderBy("timestamp", "desc"));
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
-        const { timestamp, content, temperature, humidity } = doc.data();
+        const { timestamp, temperature, humidity } = doc.data();
         newNotif.push({
           id: doc.id,
-          content,
           timestamp,
           temperature,
           humidity,
