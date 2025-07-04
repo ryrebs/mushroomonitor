@@ -1,3 +1,5 @@
+### mushroomonitor - monitor mushroom status and control monitorting devices from your mobile app.
+
 Generating apk.
 
 Prerequities:
