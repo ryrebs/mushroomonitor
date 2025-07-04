@@ -1,4 +1,11 @@
-### mushroomonitor - monitor mushroom status and control monitorting devices from your mobile app.
+### mushroomonitor 
+  
+  - monitor mushroom status and control monitorting devices from your mobile app.
+
+### Tech
+
+  - Firebase
+  - React Native Expo
 
 Generating apk.
 
